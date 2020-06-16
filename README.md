@@ -14,10 +14,10 @@ This program gets your external IP address, checks it against your "saved" IP ad
 ## Usage Examples
 [config] = path to an IPWatch configuration file
 
-1. `python3 ipwatch.py [config]`
-2. `./ipwatch.py [config]`
-3. `python3 ipwatch.py config.txt`
-4. `./ipwatch.py config.txt`
+- `python3 ipwatch.py [config]`
+- `./ipwatch.py [config]`
+- `python3 ipwatch.py config.txt`
+- `./ipwatch.py config.txt`
 
 ## Installation
 ### Debian based Linux systems
