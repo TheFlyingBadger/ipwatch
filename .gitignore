@@ -1,0 +1,5 @@
+__pycache__/
+oldip.txt
+servers.json
+serverCache.json
+config.txt

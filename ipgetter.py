@@ -34,24 +34,26 @@ import random
 import ssl
 import json
 import os 
+import six
+
 from datetime import datetime, timedelta
+from sys      import exc_info
 
-from sys import version_info
-
-PY3K = version_info >= (3, 0)
-
-if PY3K:
-    import urllib.request as urllib
-    import http.cookiejar as cjar
+if six.PY3:
+    import urllib.request   as urllib
+    import http.cookiejar   as cjar
 else:
-    import urllib2 as urllib
-    import cookielib as cjar
+    import urllib2          as urllib
+    import cookielib        as cjar
 
 __version__ = "0.7"
 
 
 def myip():
     return IPgetter().get_externalip()
+
+def myipAndSource():
+    return IPgetter().get_externalip_and_source()
 
 
 class IPgetter(object):
@@ -64,16 +66,39 @@ class IPgetter(object):
     '''
 
     def __init__(self):
+        
+        JSON_LIST_URL = "https://raw.githubusercontent.com/begleysm/ipwatch/master/servers.json"
         JSON_FILENAME = 'serverCache.json'
+        JSON_ERRFILE  = os.path.basename(JSON_LIST_URL)
         now           = datetime.now()
         currentTS     = datetime.timestamp(now)
         theList       = None
+
+        def writeJSONCache (theContent, theFilename = JSON_FILENAME):
+            if six.PY3:
+                with open(theFilename, 'w',encoding="utf-8") as outfile:
+                    outfile.write(theContent)
+            else:
+                with open(theFilename, 'w') as outfile:
+                    outfile.write(theContent)
+
         if os.path.isfile(JSON_FILENAME):
             try:
                 with open(JSON_FILENAME, 'r') as infile:
                     theList   = json.load (infile)
             except:
                 pass
+
+        #
+        # remove any dumped copy of servers.json that we've got (this is only created by an exception in conversion to JSON)
+        #
+        try:
+            os.remove(JSON_ERRFILE)
+        except FileNotFoundError:
+            pass
+        except PermissionError:
+            t, v, tb = exc_info()
+            print (v)
                 
         if (theList is None
          or "expiry"         not in theList
@@ -93,12 +118,16 @@ class IPgetter(object):
                            ,expiryDisplay  = expiryDate.strftime('%Y-%m-%dT%H:%M:%S')
                            ,servers        = []
                            )
-            operUrl = urllib.urlopen("https://raw.githubusercontent.com/begleysm/ipwatch/master/servers.json")
+            operUrl = urllib.urlopen(JSON_LIST_URL)
             if(operUrl.getcode()==200):
                 data               = operUrl.read()
-                theList["servers"] = json.loads(data)
-                with open(JSON_FILENAME, 'w') as outfile:
-                    outfile.write(json.dumps(theList, indent=4))
+                try:
+                    theList["servers"] = json.loads(data)
+                    writeJSONCache (json.dumps(theList, indent=4))
+                except:
+                    t, v, tb = exc_info()
+                    writeJSONCache (data, theFilename=JSON_ERRFILE)
+                    six.reraise(t, v, tb)
             else:
                 print("Error receiving data", operUrl.getcode())
         self.server_list = theList["servers"]
@@ -108,11 +137,20 @@ class IPgetter(object):
         '''
         This function gets your IP from a random server
         '''
+        return (self.get_externalip_and_source())["ip"]
 
-        myip = ''
+    def get_externalip_and_source(self):
+        '''
+        This function gets your IP from a random server, it also returns which server that was
+        '''
+        myip = dict (ip     = None
+                    ,server = None
+                    )
+        #myip = ''
         for i in range(7):
-            myip = self.fetch(random.choice(self.server_list))
-            if myip != '':
+            myip["server"] = random.choice(self.server_list)
+            myip["ip"]     = self.fetch(myip["server"])
+            if myip["ip"] is not None and len(myip["ip"]) > 0:
                 break
         return myip
 
@@ -135,7 +173,7 @@ class IPgetter(object):
             content = url.read()
 
             # Didn't want to import chardet. Prefered to stick to stdlib
-            if PY3K:
+            if six.PY3:
                 try:
                     content = content.decode('UTF-8')
                 except UnicodeDecodeError:
@@ -174,4 +212,4 @@ class IPgetter(object):
 
 if __name__ == '__main__':
     print(myip())
-
+    print(myipAndSource())
