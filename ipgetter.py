@@ -48,6 +48,10 @@ else:
 
 __version__ = "0.7"
 
+IPV4_REGEX_STRING = ''
+for octet in range(4):
+    IPV4_REGEX_STRING += '{0}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'.format('\.' if octet > 0 else '')
+    
 
 def myip():
     return IPgetter().get_externalip()
@@ -69,7 +73,7 @@ class IPgetter(object):
         
         JSON_LIST_URL = "https://raw.githubusercontent.com/begleysm/ipwatch/master/servers.json"
         JSON_FILENAME = 'serverCache.json'
-        JSON_ERRFILE  = os.path.basename(JSON_LIST_URL)
+        JSON_ERRFILE  = 'local'+os.path.basename(JSON_LIST_URL)
         now           = datetime.now()
         currentTS     = datetime.timestamp(now)
         theList       = None
@@ -158,18 +162,21 @@ class IPgetter(object):
         '''
         This function gets your IP from a specific server.
         '''
-        url = None
-        cj = cjar.CookieJar()
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        opener = urllib.build_opener(urllib.HTTPCookieProcessor(cj), urllib.HTTPSHandler(context=ctx))
-        opener.addheaders = [('User-agent', "Mozilla/5.0 (X11; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/57.0"),
-                             ('Accept', "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
-                             ('Accept-Language', "en-US,en;q=0.5")]
+        url                     = None
+        cj                      = cjar.CookieJar()
+        ctx                     = ssl.create_default_context()
+        ctx.check_hostname      = False
+        ctx.verify_mode         = ssl.CERT_NONE
+        opener                  = urllib.build_opener   (urllib.HTTPCookieProcessor(cj)
+                                                        ,urllib.HTTPSHandler(context=ctx)
+                                                        )
+        opener.addheaders       = [('User-agent', "Mozilla/5.0 (X11; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/57.0")
+                                  ,('Accept', "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                                  ,('Accept-Language', "en-US,en;q=0.5")
+                                  ]
 
         try:
-            url = opener.open(server, timeout=4)
+            url     = opener.open(server, timeout=4)
             content = url.read()
 
             # Didn't want to import chardet. Prefered to stick to stdlib
@@ -178,17 +185,14 @@ class IPgetter(object):
                     content = content.decode('UTF-8')
                 except UnicodeDecodeError:
                     content = content.decode('ISO-8859-1')
-
-            m = re.search(
-                '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)',
-                content)
-            myip = m.group(0)
-            return myip if len(myip) > 0 else ''
+            m    = re.search(IPV4_REGEX_STRING,content)
+            myip = m.group(0) if len(m.group(0)) > 0 else ''
         except Exception:
-            return ''
+            myip = ''
         finally:
             if url:
                 url.close()
+        return myip
 
     def test(self):
         '''
@@ -201,14 +205,18 @@ class IPgetter(object):
         for server in self.server_list:
             resultdict.update(**{server: self.fetch(server)})
 
-        ips = sorted(resultdict.values())
-        ips_set = set(ips)
+        ips         = list(set(sorted(resultdict.values())))
+        maxIPLen    = len(max(ips, key=len))
+        maxIPLen    = maxIPLen if maxIPLen > 0 else 15
+
         print('\nNumber of servers: {}'.format(len(self.server_list)))
-        print("IP's :")
-        for ip, ocorrencia in zip(ips_set, map(lambda x: ips.count(x), ips_set)):
-            print('{0} = {1} ocurrenc{2}'.format(ip if len(ip) > 0 else 'broken server', ocorrencia, 'y' if ocorrencia == 1 else 'ies'))
-        print('\n')
-        print(resultdict)
+        for ip, occurrences in zip(ips, map(lambda x: list(resultdict.values()).count(x), ips)):
+            print('{0} = {1} occurrence{2}'.format(ip if len(ip) > 0 else 'Broken Server', occurrences, '' if occurrences == 1 else 's'))
+        print("\nIPs :")
+        resultSorted = sorted(resultdict.items(), key=lambda x: (x[1],x[0]))
+        for d in resultSorted:
+            print ('{0} - {1}'.format(d[1].ljust(maxIPLen),d[0]))
+        # print(resultdict)
 
 if __name__ == '__main__':
     print(myip())

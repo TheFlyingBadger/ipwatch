@@ -1,36 +1,33 @@
-[
-    "http://ip.dnsexit.com", 
-    "http://ifconfig.me/ip", 
-    "http://ipecho.net/plain", 
-    "http://checkip.dyndns.org/plain", 
-    "http://websiteipaddress.com/WhatIsMyIp", 
-    "http://www.my-ip-address.net/", 
-    "http://myexternalip.com/raw", 
-    "http://www.canyouseeme.org/", 
-    "http://www.trackip.net/", 
-    "http://icanhazip.com/", 
-    "http://www.ipchicken.com/", 
-    "http://whatsmyip.net/", 
-    "http://www.ip-adress.com/", 
-    "http://www.tracemyip.org/", 
-    "http://www.lawrencegoetz.com/programs/ipinfo/", 
-    "http://ip-lookup.net/", 
-    "http://www.mon-ip.com/en/my-ip/", 
-    "http://ipgoat.com/", 
-    "http://www.myipnumber.com/my-ip-address.asp", 
-    "http://formyip.com/", 
-    "https://check.torproject.org/", 
-    "http://www.displaymyip.com/", 
-    "http://www.geoiptool.com/", 
-    "https://www.whatsmydns.net/whats-my-ip-address.html", 
-    "https://www.privateinternetaccess.com/pages/whats-my-ip/", 
-    "http://checkip.dyndns.com/", 
-    "http://www.ip-adress.eu/", 
-    "http://www.infosniper.net/", 
-    "https://wtfismyip.com/text", 
-    "http://httpbin.org/ip", 
-    "https://diagnostic.opendns.com/myip", 
-    "http://checkip.amazonaws.com", 
-    "https://api.ipify.org", 
-    "https://v4.ident.me"
+["https://api.ipify.org" 
+,"https://check.torproject.org/" 
+,"http://checkip.amazonaws.com" 
+,"http://checkip.dyndns.com/" 
+,"http://checkip.dyndns.org/plain" 
+,"https://diagnostic.opendns.com/myip" 
+,"http://httpbin.org/ip" 
+,"http://icanhazip.com/" 
+,"http://ifconfig.me/ip" 
+,"http://ip.dnsexit.com" 
+,"http://ipecho.net/plain" 
+,"http://ipgoat.com/" 
+,"http://ip-lookup.net/" 
+,"http://myexternalip.com/raw" 
+,"https://v4.ident.me"
+,"http://websiteipaddress.com/WhatIsMyIp" 
+,"http://whatsmyip.net/" 
+,"https://wtfismyip.com/text" 
+,"http://www.canyouseeme.org/" 
+,"http://www.displaymyip.com/" 
+,"http://www.geoiptool.com/" 
+,"http://www.infosniper.net/" 
+,"http://www.ip-adress.com/" 
+,"http://www.ip-adress.eu/" 
+,"http://www.ipchicken.com/" 
+,"http://www.lawrencegoetz.com/programs/ipinfo/" 
+,"http://www.mon-ip.com/en/my-ip/" 
+,"http://www.my-ip-address.net/" 
+,"http://www.myipnumber.com/my-ip-address.asp" 
+,"http://www.tracemyip.org/" 
+,"http://www.trackip.net/" 
+,"https://www.whatsmydns.net/whats-my-ip-address.html" 
 ]

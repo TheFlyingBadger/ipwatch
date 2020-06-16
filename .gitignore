@@ -1,5 +1,5 @@
 __pycache__/
 oldip.txt
-servers.json
+localservers.json
 serverCache.json
 config.txt
